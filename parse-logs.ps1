@@ -27,7 +27,7 @@ New-Item $oldLogFolder -ItemType directory
 New-Item $newLogFolder -ItemType directory
 $domainList = Get-Content $domainFile # get Domain list
 
-#Start to process
+#Expand cab files to log files
 foreach ($cabFolder in $logfolderList) {
     #crawl Cab folder
     $cabFolderPath = $loglocation + $cabFolder
@@ -43,24 +43,26 @@ foreach ($cabFolder in $logfolderList) {
 }
 
 #Parse log files
-
-   
 foreach ($domain in $domainList) {
     $newDirectory = $newLogFolder + $domain
-    New-Item $newDirectory -ItemType directory
+    New-Item $newDirectory -ItemType directory #Create directories for domains
      # need to crawl the oldLogFolders
      $OldLogFolderList = Get-ChildItem $oldLogFolder -Directory
      foreach ($folderName in $OldLogFolderList) {
-        $newSubDirectory = $newDirectory + "\" + $folderName
-        New-Item $newSubDirectory -ItemType directory
-
+        $newLogSubDirectory = $newDirectory + "\" + $folderName
+        New-Item $newLogSubDirectory -ItemType directory
+        $oldLogSubFolder = $oldLogFolder + "\" + $folderName
+        $OldLogFileList = Get-ChildItem $oldLogSubFolder
+        foreach ($oldLogFile in $OldLogFileList) {
+            $oldLogFilePath = $oldLogSubFolder + "\" + $oldLogFile
+            $newLogFilePath = $newLogSubDirectory + "\" + $oldLogFile
+            $myLogHeader = Get-Content $oldLogFilePath | where {$_ -Like "#[D-V]*" }
+            $mydomain = "*" + $domain + "*"
+            $myLog = Get-Content $oldLogFilePath | where {$_ -Like $mydomain }
+            $myLogHeader | Out-File $newLogFilePath
+            $myLog | Out-File $newLogFilePath -Append
+        }
      }
-    #for Each log folder
-        #create a ...domain\folder
-        #for Each log file
-            #parse file
-            #Create a new logfile
-
 }
 
 
