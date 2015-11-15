@@ -26,10 +26,6 @@ $newLogFolder = $baseDirectory + "newLogs\"
 New-Item $oldLogFolder -ItemType directory
 New-Item $newLogFolder -ItemType directory
 $domainList = Get-Content $domainFile # get Domain list
-foreach ($domain in $domainList) {
-    $newDirectory = $newLogFolder + $domain
-    New-Item $newDirectory -ItemType directory
-}
 
 #Start to process
 foreach ($cabFolder in $logfolderList) {
@@ -42,17 +38,29 @@ foreach ($cabFolder in $logfolderList) {
     foreach ($file in $cabFile) {
         $cabFilePath = $cabFolderPath + "\" + $file.Name
         $logFilePath = $oldLogSubFolder + $file.BaseName + ".txt"
-        #$logFilePath
         expand $cabFilePath $logFilePath
     }
-
-    #extract file
-
-   # $newLogSubFolder = $newLogFolder + $cabFolder.name + "\"
-   # New-Item 
-    ##unpack file
-    #$cabFile = $sourceFlolder + $file.Name
-    #$logFile = $destinationFolder + $file.BaseName + ".txt"
-    #expand $cabFile $logFile
 }
+
+#Parse log files
+
+   
+foreach ($domain in $domainList) {
+    $newDirectory = $newLogFolder + $domain
+    New-Item $newDirectory -ItemType directory
+     # need to crawl the oldLogFolders
+     $OldLogFolderList = Get-ChildItem $oldLogFolder -Directory
+     foreach ($folderName in $OldLogFolderList) {
+        $newSubDirectory = $newDirectory + "\" + $folderName
+        New-Item $newSubDirectory -ItemType directory
+
+     }
+    #for Each log folder
+        #create a ...domain\folder
+        #for Each log file
+            #parse file
+            #Create a new logfile
+
+}
+
 
