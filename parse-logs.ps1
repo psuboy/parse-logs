@@ -35,10 +35,10 @@
     and on a seperate line.
 
 .EXAMPLE 1 (with parameter tags)
-    .\parse-logs.ps1 -baseDirectory E:\_PS_Scripts\Data\cabfile\ -cabSubFolder cab\ -domainFile E:\_PS_Scripts\Data\cabFile\domains.txt
+    .\parse-logs.ps1 -baseDirectory E:\_PS_Scripts\Data\cabfile\ -cabSubFolder W3SVC1\ -domainFile E:\_PS_Scripts\Data\domains.txt
 
 .EXAMPLE 2 (without parameter tags)
-    .\parse-logs.ps1 E:\_PS_Scripts\Data\cabfile\  cab\ E:\_PS_Scripts\Data\cabFile\domains.txt
+    .\parse-logs.ps1 E:\_PS_Scripts\Data\cabfile\  W3SVC1\ E:\_PS_Scripts\Data\domains.txt
 #>
 [CmdletBinding()]
 Param(
@@ -50,26 +50,26 @@ Param(
     [string] $domainFile
 )
 
-$logLocation = $baseDirectory + $cabSubFolder #base log location
-$logFolderList = Get-ChildItem $logLocation -Directory
-$logFolderList.name
+$logLocation = $baseDirectory + $cabSubFolder #base log location ex: W3SVC1\
+$logFolderList = Get-ChildItem $baseDirectory -Directory
+#$logFolderList.name
 
 $oldLogFolder = $baseDirectory + "oldLogs\"
 $newLogFolder = $baseDirectory + "newLogs\"
 New-Item $oldLogFolder -ItemType directory
 New-Item $newLogFolder -ItemType directory
-$domainList = Get-Content $domainFile # get Domain list
+$domainList = Get-Content $domainFile # get Domain list  .\domains.txt
 
 #Expand cab files to log files
 foreach ($cabFolder in $logfolderList) {
     #crawl Cab folder
-    $cabFolderPath = $loglocation + $cabFolder
+    $cabFolderPath = $baseDirectory + $cabFolder.name + "\" + $cabSubFolder
     $cabFile = Get-ChildItem $cabFolderPath
     #create old log folders
     $oldLogSubFolder = $oldLogFolder + $cabFolder.name + "\"
     New-Item $oldLogSubFolder -ItemType directory
     foreach ($file in $cabFile) {
-        $cabFilePath = $cabFolderPath + "\" + $file.Name
+        $cabFilePath = $cabFolderPath + $file.Name
         $logFilePath = $oldLogSubFolder + $file.BaseName + ".txt"
         expand $cabFilePath $logFilePath
     }
